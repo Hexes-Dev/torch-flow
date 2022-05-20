@@ -14,5 +14,13 @@
     width: 4px;
     height: 100%;
     position: absolute;
-    background-color: blue;
+    background-color: #0000;
+    transition: background-color .5s;
+    cursor: ew-resize;
+    top: 0;
+    bottom: 0;
+}
+
+.area-divider:hover {
+    background-color: #000A;
 }

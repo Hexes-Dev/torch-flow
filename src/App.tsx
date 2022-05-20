@@ -8,7 +8,8 @@ function App() {
   
   let defaultAreas = [
     <Flow/>,
-    <div></div>
+    <div></div>,
+    <p>Column 3</p>
   ]
 
   return (
