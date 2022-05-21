@@ -8,7 +8,7 @@ function App() {
   
   let defaultAreas = [
     <Flow/>,
-    <div></div>,
+    <div><input type='text' placeholder='Enter Text Here'></input></div>,
     <p>Column 3</p>
   ]
 
