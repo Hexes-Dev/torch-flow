@@ -1,4 +1,4 @@
-import React, {useState, useRef, MouseEvent, MouseEventHandler} from 'react';
+import React, {useState, useRef, MouseEvent, MouseEventHandler, useEffect} from 'react';
 import './Areas.css';
 
 export default function AreasPanel(props: any) {
@@ -11,6 +11,17 @@ export default function AreasPanel(props: any) {
     let innerElement = props?.children || <div></div>;
     let width = props?.width || 100;
 
+
+    // let LOCAL_STORAGE_KEY = `torchFlow.areapanel.${props.key}`;
+
+    // useEffect( () => {
+    //     const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+    //     if (storedState) innerElement = JSON.parse(storedState);
+    // }, []);
+
+    // useEffect( () => {
+    //     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(innerElement));
+    // }, [innerElement])
     
 
     return(

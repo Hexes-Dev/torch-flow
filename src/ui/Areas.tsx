@@ -1,4 +1,4 @@
-import React, {useState, useRef, useLayoutEffect, useEffect} from 'react';
+import React, {useState, useRef, useLayoutEffect, useEffect, ChangeEventHandler, ChangeEvent} from 'react';
 import './Areas.css';
 import AreasDivider from './AreasDivider';
 import AreasPanel from './AreasPanel';
@@ -15,6 +15,7 @@ export default function Areas(props: any) {
     let margin = props?.margin || 2
     let dividerPadding = props?.dividerPadding || 8;
     let direction = props?.direction || 'row';
+    
 
     let defaultElements = props?.defaultAreas || [<div></div>];
 
@@ -22,6 +23,7 @@ export default function Areas(props: any) {
         return {
             element: element,
             width: 100 / defaultElements.length,
+            key: uuidv4(),
         }
     });
 
@@ -34,7 +36,8 @@ export default function Areas(props: any) {
     function addPanel() {
         let newPanel = {
             element: <div></div>,
-            width: 100
+            width: 100,
+            key: uuidv4(),
         }
         let currentChildren = [...children, newPanel];
         currentChildren.forEach( (v: any, i: number) => {
@@ -99,13 +102,20 @@ export default function Areas(props: any) {
 
         setChildren((children: any) => {
             return currentChildren
-        })
+        });
     }
+
+    let [v, setV] = useState('value');
+    function update(e: any) {
+        setV(e.target.value)
+    }
+
+    let kids = children.map( (child: any, idx: number) => (<AreasPanel key={child.key} index={idx} removePanel={removePanel} width={child.width}>{child.element}</AreasPanel>));
 
 
     return(
         <div className='areas' ref={areaRef} style={{flexDirection: direction}} onMouseMove={resizeEvent} onMouseUp={() => setActiveDivider(-1)} /*onMouseMove={dividerEventMove} onMouseUp={dividerEventEnd}*/>
-            {children.map( (child: any, idx: number) => (<AreasPanel key={uuidv4()} index={idx} removePanel={removePanel} width={child.width}>{child.element}</AreasPanel>))}
+            {kids}
             {children.map( (child: any, idx: number) => (<AreasDivider key={uuidv4()} index={idx} setActive={setActiveDivider} resizeEvent={resizeEvent} center={getDividerCenter(idx)}/>))}
             <FAB onClick={(e: React.MouseEvent) => addPanel()} ></FAB>
         </div>
