@@ -29,7 +29,7 @@ export default function AreasPanel(props: any) {
             'borderRadius': borderRadius+'px',
             'margin': margin+'px',
             'border': `solid ${borderWidth}px black`,
-            'width': `${width}%`,
+            'width': `${width}px`,
         }}>
             {innerElement}
         </div>

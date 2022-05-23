@@ -12,9 +12,11 @@ export default function AreasDivider(props: any) {
         e.preventDefault();
     }
 
+    
+
     return (
         <div className='area-divider' onMouseDown={handleMouseDown} style={{
-            left: `${center - width / 2}px`,
+            left: `${center(index)}px`,
             width: `${width}px`
         }}>
 

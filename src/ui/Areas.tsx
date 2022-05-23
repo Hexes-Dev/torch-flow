@@ -19,16 +19,28 @@ export default function Areas(props: any) {
 
     let defaultElements = props?.defaultAreas || [<div></div>];
 
-    let areas = defaultElements.map( (element: any) => {
-        return {
-            element: element,
-            width: 100 / defaultElements.length,
-            key: uuidv4(),
-        }
-    });
+    const areaRef: any = useRef();
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    let [children, setChildren]: Array<any> = useState([]);
+
+    useEffect( () => {
+        let areas = defaultElements.map( (element: any) => {
+            return {
+                element: element,
+                width: dimensions.width / defaultElements.length - 2 * defaultElements.length * (margin + borderWidth),
+                key: uuidv4(),
+            }
+        });
+
+        setChildren( () => {
+            return areas;
+        });
+
+    }, [dimensions]);
 
     
-    let [children, setChildren] = useState(areas);
+    
 
     const LOCAL_STORAGE_KEY = 'areas.area-list';
 
@@ -36,13 +48,15 @@ export default function Areas(props: any) {
     function addPanel() {
         let newPanel = {
             element: <div></div>,
-            width: 100,
+            width: 0,
             key: uuidv4(),
-        }
+        };
+
         let currentChildren = [...children, newPanel];
         currentChildren.forEach( (v: any, i: number) => {
-            currentChildren[i].width = 100 / currentChildren.length;
+            currentChildren[i].width = dimensions.width / currentChildren.length - 2 * currentChildren.length * (margin + borderWidth);
         });
+        
         setChildren( (children: any) => {
             return currentChildren;
         });
@@ -59,8 +73,7 @@ export default function Areas(props: any) {
         });
     }
 
-    const areaRef: any = useRef();
-    const [dimensions, setDimensions] = useState({ width:0, height: 0 });
+
   
     useLayoutEffect(() => {
       if (areaRef.current) {
@@ -71,19 +84,17 @@ export default function Areas(props: any) {
       }
     }, []);
 
-    function getDividerCenter(idx: number) {
-        let itemsLeft = [...children].splice(0, idx);
-        let percentLeft = itemsLeft.reduce( (prev: any, curr: any) => {
-            return prev + curr.width;
-        }, 0);
+    // function getDividerCenter(idx: number) {
+    //     let itemsLeft = [...children].splice(0, idx);
+    //     let percentLeft = itemsLeft.reduce( (prev: any, curr: any) => {
+    //         return prev + curr.width;
+    //     }, 0);
 
-        let left = percentLeft / 100 * dimensions.width;
-        return left;
-    }
+    //     let left = percentLeft / 100 * dimensions.width;
+    //     return left;
+    // }
 
     let [activeDivider, setActiveDivider] = useState(-1);
-
-    let [xy, setXY] = useState([0, 0]);
     
     function resizeEvent(e: React.MouseEvent) {
 
@@ -95,28 +106,38 @@ export default function Areas(props: any) {
         let currentChildren = [...children];
         let first = currentChildren[idx - 1];
         let last = currentChildren[idx];
-        let movementPercent = e.movementX / dimensions.width * 100;
+        // let movementPercent = e.movementX / dimensions.width * 100;
 
-        first.width = first.width + movementPercent;
-        last.width = last.width - movementPercent;
+        first.width = first.width + e.movementX;
+        last.width = last.width - e.movementX;
 
         setChildren((children: any) => {
             return currentChildren
         });
     }
 
-    let [v, setV] = useState('value');
-    function update(e: any) {
-        setV(e.target.value)
-    }
+    let childComponents = children.map( (child: any, idx: number) => {
+        return (<AreasPanel key={child.key} index={idx} removePanel={removePanel} width={child.width}>{child.element}</AreasPanel>)
+    });
+    
+    let childDividers = children.map( (child: any, idx: number) => {
+        let dividerLocation = (idx: number) => {
+            let itemsLeft = [...children].splice(0, idx);
+            let left = itemsLeft.reduce( (prev: any, curr: any) => {
+                return prev + curr.width;
+            }, 0);
 
-    let kids = children.map( (child: any, idx: number) => (<AreasPanel key={child.key} index={idx} removePanel={removePanel} width={child.width}>{child.element}</AreasPanel>));
-
+                
+            // let left = dimensions.width;
+            return left;
+        }
+        return (<AreasDivider key={uuidv4()} index={idx} setActive={setActiveDivider} resizeEvent={resizeEvent} center={dividerLocation}/>)
+    });
 
     return(
-        <div className='areas' ref={areaRef} style={{flexDirection: direction}} onMouseMove={resizeEvent} onMouseUp={() => setActiveDivider(-1)} /*onMouseMove={dividerEventMove} onMouseUp={dividerEventEnd}*/>
-            {kids}
-            {children.map( (child: any, idx: number) => (<AreasDivider key={uuidv4()} index={idx} setActive={setActiveDivider} resizeEvent={resizeEvent} center={getDividerCenter(idx)}/>))}
+        <div className='areas' ref={areaRef} style={{flexDirection: direction}} onMouseMove={resizeEvent} onMouseUp={() => setActiveDivider(-1)}>
+            {childComponents}
+            {childDividers}
             <FAB onClick={(e: React.MouseEvent) => addPanel()} ></FAB>
         </div>
     )
